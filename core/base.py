@@ -7,7 +7,7 @@ import torch.optim as optim
 from bisect import bisect_right
 import os
 
-from .model import Model
+from .models import Model
 from tools import CrossEntropyLabelSmooth, TripletLoss, os_walk
 
 
@@ -132,6 +132,7 @@ class DemoBase(Base):
 
 	def __init__(self, config):
 		self.pid_num = config.pid_num
+		print('DemoBase init pid_num',config.pid_num)
 		# init model
 		self._init_device()
 		self._init_model()

@@ -75,6 +75,7 @@ class ReIDLoaders:
         train_samples_path = self.samples_path[train_dataset]
         if train_dataset == 'market_train':
             samples = Samples4Market(train_samples_path)
+            print('samples', samples, train_samples_path)
         elif train_dataset == 'duke_train':
             samples = Samples4Duke(train_samples_path)
 
@@ -106,7 +107,9 @@ class ReIDLoaders:
         :param k:
         :return:
         '''
+#        print([s[1] for s in samples.samples])
         dataset = PersonReIDDataSet(samples.samples, transform=transform)
+        print('where',data)
         loader = data.DataLoader(dataset, batch_size=p * k, num_workers=8, drop_last=False, sampler=ClassUniformlySampler(dataset, class_position=1, k=k))
         iters = IterLoader(loader)
 

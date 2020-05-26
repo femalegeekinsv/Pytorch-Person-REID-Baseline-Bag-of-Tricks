@@ -19,6 +19,8 @@ def train_an_epoch(config, base, loaders):
 
 		### loss
 		ide_loss = base.ide_creiteron(cls_score, pids)
+		#print('len pids is 64 batch size',len(pids))
+		#print('leafures is 64x2048', len(features), len(features[0]))
 		triplet_loss = base.triplet_creiteron(features, features, features, pids, pids, pids)
 		loss = ide_loss + triplet_loss
 		acc = accuracy(cls_score, pids, [1])[0]

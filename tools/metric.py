@@ -7,7 +7,8 @@ def cosine_dist(x, y):
 	with size (n1, d) and (n2, d) and type torch.tensor
 	return a matrix (n1, n2)
 	'''
-
+#	x = x[0] for profiling
+#	x = F.normalize(x, dim=0)
 	x = F.normalize(x, dim=1)
 	y = F.normalize(y, dim=1)
 	return torch.matmul(x, y.transpose(0,1))

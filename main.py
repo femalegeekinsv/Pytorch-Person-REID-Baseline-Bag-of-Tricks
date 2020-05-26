@@ -1,9 +1,3 @@
-'''
-This file provides
-train, test, visualization operations on market and duke dataset
-'''
-
-
 import argparse
 import os
 import ast
@@ -30,10 +24,12 @@ def main(config):
 
 		# automatically resume model from the latest one
 		if config.auto_resume_training_from_lastest_steps:
+			print('resume', base.output_path)
 			start_train_epoch = base.resume_last_model()
+		#start_train_epoch = 0
 
 		# main loop
-		for current_epoch in range(start_train_epoch, config.total_train_epochs):
+		for current_epoch in range(start_train_epoch, config.total_train_epochs+1):
 			# save model
 			base.save_model(current_epoch)
 			# train
@@ -50,7 +46,7 @@ def main(config):
 	elif config.mode == 'test':	# test mode
 		base.resume_from_model(config.resume_test_model)
 		mAP, CMC = test(config, base, loaders)
-		logger('Time: {}; Test Dataset: {}, \nmAP: {} \nRank: {}'.format(time_now(), config.test_dataset, mAP, CMC))
+		logger('Time: {}; Test Dataset: {}, \nmAP: {} \nRank: {} with len {}'.format(time_now(), config.test_dataset, mAP, CMC, len(CMC)))
 
 
 	elif config.mode == 'visualize': # visualization mode
@@ -68,7 +64,7 @@ if __name__ == '__main__':
 	parser.add_argument('--output_path', type=str, default='results/', help='path to save related informations')
 
 	# dataset configuration
-	parser.add_argument('--market_path', type=str, default='/home/wangguanan/datasets/PersonReIDDatasets/Market/Market-1501-v15.09.15/')
+	parser.add_argument('--market_path', type=str, default='/home/teresa/reID/reid-strong-baseline/data/market1501')
 	parser.add_argument('--duke_path', type=str, default='/home/wangguanan/datasets/PersonReIDDatasets/Duke/occlude_DukeMTMC-reID/')
 	parser.add_argument('--train_dataset', type=str, default='market', help='market, duke')
 	parser.add_argument('--test_dataset', type=str, default='market', help='market, duke')
@@ -93,7 +89,7 @@ if __name__ == '__main__':
 	parser.add_argument('--test_mode', type=str, default='inter-camera', help='inter-camera, intra-camera, all')
 
 	# visualization configuration
-	parser.add_argument('--resume_visualize_model', type=str, default='/path/to/pretrained/model.pkl',
+	parser.add_argument('--resume_visualize_model', type=str, default='./results/market/model_120.pkl',
 						help='only availiable under visualize model')
 	parser.add_argument('--visualize_dataset', type=str, default='',
 						help='market, duke, only  only availiable under visualize model')
@@ -106,6 +102,17 @@ if __name__ == '__main__':
 	# main
 	config = parser.parse_args()
 	main(config)
+
+   
+#    python main.py --mode train --train_dataset market --test_dataset market --market_path /home/teresa/reID/reid-strong-baseline/data/market1501 --output_path ./results/market/
+
+#    python main.py --mode test --train_dataset market --test_dataset market --market_path /home/teresa/reID/reid-strong-baseline/data/market1501/ --resume_test_model results/market/model_120.pkl --output_path ./results/test-on-market/
+
+#    python main.py --mode visualize --visualize_mode inter-camera --train_dataset market --visualize_dataset market --market_path /home/teresa/reID/reid-strong-baseline/data/market1501/ --resume_visualize_model ./results/market/model_120.pkl --visualize_output_path ./results/vis-on-market/
+
+#    python demo.py --resume_visualize_model ./results/market/model_120.pkl --visualize_output_path ./results/vis-on-cus  --query_path ./../cus/query/ --gallery_path ./../cus/gallery/
+    
+    
 
 
 

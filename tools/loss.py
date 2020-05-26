@@ -41,13 +41,14 @@ class RankingLoss:
 	def __init__(self):
 		pass
 
-	def _label2similarity(sekf, label1, label2):
+	def _label2similarity(self, label1, label2):
 		'''
 		compute similarity matrix of label1 and label2
 		:param label1: torch.Tensor, [m]
 		:param label2: torch.Tensor, [n]
 		:return: torch.Tensor, [m, n], {0, 1}
 		'''
+		#print('label', label1)
 		m, n = len(label1), len(label2)
 		l1 = label1.view(m, 1).expand([m, n])
 		l2 = label2.view(n, 1).expand([n, m]).t()
@@ -59,8 +60,12 @@ class RankingLoss:
 		if more_similar is 'smaller':
 			sorted_mat_distance, _ = torch.sort(mat_distance + (-9999999.) * (1 - mat_similarity), dim=1,descending=True)
 			hard_p = sorted_mat_distance[:, 0]
+			#print('d size type',type(sorted_mat_distance))
+			#print((sorted_mat_distance.shape))
+			#print('for hard p',sorted_mat_distance)
 			sorted_mat_distance, _ = torch.sort(mat_distance + (9999999.) * (mat_similarity), dim=1, descending=False)
 			hard_n = sorted_mat_distance[:, 0]
+			#print('for hard n',sorted_mat_distance)
 			return hard_p, hard_n
 
 		elif more_similar is 'larger':
@@ -110,6 +115,7 @@ class TripletLoss(RankingLoss):
 
 		elif self.metric == 'euclidean':
 			mat_dist = euclidean_dist(emb1, emb2)
+			#print('mat is 64x64',len(mat_dist),len(mat_dist[0]), len(emb1))
 			mat_sim = self._label2similarity(label1, label2)
 			hard_p, _ = self._batch_hard(mat_dist, mat_sim.float(), more_similar='smaller')
 
@@ -118,6 +124,12 @@ class TripletLoss(RankingLoss):
 			_, hard_n = self._batch_hard(mat_dist, mat_sim.float(), more_similar='smaller')
 
 			margin_label = torch.ones_like(hard_p)
-
+			
+		harder_example_mining = False
+		if harder_example_mining == True:
+			hard_p *= (1.0 + 0.2)
+			hard_n *= (1.0 - 0.2)
+			#print("harder")
+			
 		return self.margin_loss(hard_n, hard_p, margin_label)
 

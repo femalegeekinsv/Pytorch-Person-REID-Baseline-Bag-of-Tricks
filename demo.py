@@ -1,17 +1,17 @@
 '''
 given a pre-trained model, visualize a customed dataset
 pre-trained model can be got by running main.py in a train mode
-    or download from the link (see it in README.md)
 '''
 
 import argparse
-from core import CustomedLoaders, DemoBase, visualize
+from core import CustomedLoaders, OnTheFlyLoaders, DemoBase, visualize
 from tools import make_dirs
 
 
 def demo(config):
     # init loaders and base
-    loaders = CustomedLoaders(config)
+    #loaders = CustomedLoaders(config)
+    loaders = OnTheFlyLoaders(config)
     base = DemoBase(config)
 
     # visualization
@@ -37,3 +37,12 @@ if __name__ == '__main__':
 
     config = parser.parse_args()
     demo(config)
+    
+    
+    #python main.py --mode train --train_dataset market --test_dataset market --market_path /home/teresa/reID/reid-strong-baseline/data/market1501 --output_path ./results/market/
+
+    #python main.py --mode test --train_dataset market --test_dataset market --market_path /home/teresa/reID/reid-strong-baseline/data/market1501/ --resume_test_model results/market/model_120.pkl --output_path ./results/test-on-market/
+
+    #python main.py --mode visualize --visualize_mode inter-camera --train_dataset market --visualize_dataset market --market_path /home/teresa/reID/reid-strong-baseline/data/market1501/ --resume_visualize_model ./results/market/model_120.pkl --visualize_output_path ./results/vis-on-market/
+
+    #python demo.py --resume_visualize_model ./results/market/model_120.pkl --visualize_output_path ./results/vis-on-cus  --query_path ./../cus/query/ --gallery_path ./../cus/gallery/

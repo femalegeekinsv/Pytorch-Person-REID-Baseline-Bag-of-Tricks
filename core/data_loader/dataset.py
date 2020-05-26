@@ -14,7 +14,7 @@ def os_walk(folder_dir):
 class PersonReIDSamples:
 
     def __init__(self, samples_path, reorder=True):
-
+        print('init', samples_path)
         # parameters
         self.samples_path = samples_path
         self.reorder = reorder
@@ -74,6 +74,7 @@ class Samples4Market(PersonReIDSamples):
     '''
     Market Dataset
     '''
+    print('pass')
     pass
 
 

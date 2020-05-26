@@ -3,6 +3,37 @@ import torchvision
 from torchvision import transforms
 from .dataset import PersonReIDDataSet
 
+class OnTheFlyLoaders:
+    def __init__(self, config):
+        self.config = config
+        self.transform_test = transforms.Compose([
+            transforms.Resize(config.image_size, interpolation=3),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+
+        self.query_samples = []
+        self.gallery_samples = []
+        self.gallery_features = []
+
+    def add_query(self,path,pid,cid):
+        self.query_samples.append([path, pid, cid])
+
+    def add_gallery(self,path,pid,cid):
+        self.gallery_samples.append([path, pid, cid])
+
+    def add_gallery_features(self,features,pid,cid):
+        self.gallery_samples.append([features, pid, cid])
+
+    def process_data(self):
+        self.query_dataset = PersonReIDDataSet(self.query_samples, self.transform_test)
+        self.gallery_dataset = PersonReIDDataSet(self.gallery_samples, self.transform_test)
+
+        self.query_loader = \
+            torch.utils.data.DataLoader(self.query_dataset, batch_size=64, num_workers=8, drop_last=False, shuffle=False)
+        self.gallery_loader = \
+            torch.utils.data.DataLoader(self.gallery_dataset, batch_size=64, num_workers=8, drop_last=False, shuffle=False)
+
 class CustomedLoaders:
     '''
     load customed dataset

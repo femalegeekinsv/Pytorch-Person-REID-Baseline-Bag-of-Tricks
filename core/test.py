@@ -1,6 +1,6 @@
 import torch
 from tools import time_now, CatMeter, ReIDEvaluator
-
+import time
 
 def test(config, base, loaders):
 
@@ -22,7 +22,10 @@ def test(config, base, loaders):
 			for data in loader:
 				# compute feautres
 				images, pids, cids = data
+				print('batch len? 128',len(pids))
+				start_time = time.time()
 				features = base.model(images)
+				print('about 70ms',time.time()-start_time)
 				# save as query features
 				if loader_id == 0:
 					query_features_meter.update(features.data)
@@ -36,6 +39,7 @@ def test(config, base, loaders):
 
 	#
 	query_features = query_features_meter.get_val_numpy()
+	print('type and size query_features',type(query_features),len(query_features),len(query_features[0]))
 	gallery_features = gallery_features_meter.get_val_numpy()
 
 	# compute mAP and rank@k

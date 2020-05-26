@@ -20,7 +20,6 @@ def visualize_ranked_results2(distmat, dataset, save_dir='', topk=20):
         save_dir (str): directory to save output images.
         topk (int, optional): denoting top-k images in the rank list to be visualized.
     """
-    num_q, num_g = distmat.shape
 
     print('Visualizing top-{} ranks'.format(topk))
     print('# query: {}\n# gallery {}'.format(num_q, num_g))
@@ -72,7 +71,7 @@ def visualize_ranked_results2(distmat, dataset, save_dir='', topk=20):
     print("Done")
 
 
-def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='descend', mode='inter-camera'):
+def visualize_ranked_results(distmat, dataset, save_dir='', topk=5, sort='descend', mode='inter-camera'):
     """Visualizes ranked results.
     Args:
         dismat (numpy.ndarray): distance matrix of shape (nq, ng)
@@ -87,7 +86,7 @@ def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='desce
             all visualize all results
     """
     num_q, num_g = distmat.shape
-
+    print('num_q, num_g',num_q, num_g)
     print('Visualizing top-{} ranks'.format(topk))
     print('# query: {}\n# gallery {}'.format(num_q, num_g))
     print('Saving images to "{}"'.format(save_dir))
@@ -102,7 +101,7 @@ def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='desce
         indices = np.argsort(distmat, axis=1)
     elif sort is 'descend':
         indices = np.argsort(distmat, axis=1)[:, ::-1]
-
+    #print(sort, indices)
     make_dirs(save_dir)
 
     def cat_imgs_to(image_list, hit_list, text_list, target_dir):
@@ -145,13 +144,19 @@ def visualize_ranked_results(distmat, dataset, save_dir='', topk=20, sort='desce
         # target dir
         if isinstance(qimg_path, tuple) or isinstance(qimg_path, list):
             qdir = osp.join(save_dir, osp.basename(qimg_path[0]))
+            #print('a:',qdir)
         else:
             qdir = osp.join(save_dir, osp.basename(qimg_path))
+            #print('b:',qdir)
 
         # matched images
         rank_idx = 1
+        #print('for the i^th query i=', q_idx, qimg_path)
         for ii, g_idx in enumerate(indices[q_idx, :]):
+            #print('now looking at the ii^th match in gallery, will break later when it exceeds topk', ii)
+
             gimg_path, gpid, gcamid = gallery[g_idx]
+            #print(gimg_path)
             if mode == 'intra-camera':
                 valid = qcamid == gcamid
             elif mode == 'inter-camera':
