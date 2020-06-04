@@ -11,6 +11,42 @@ def os_walk(folder_dir):
         return root, dirs, files
 
 
+class PersonReIDDataSet:
+
+    def __init__(self, samples, transform):
+        self.samples = samples
+        self.transform = transform
+
+    def __getitem__(self, index):
+
+        this_sample = copy.deepcopy(self.samples[index])
+
+        this_sample[0] = self._loader(this_sample[0])
+        if self.transform is not None:
+            this_sample[0] = self.transform(this_sample[0])
+        this_sample[1] = np.array(this_sample[1])
+
+        return this_sample
+
+    def getitem_fromdetector(self, index):
+        # assuming self.samples is cropped bounding boxes in Image RGB
+        this_sample = copy.deepcopy(self.samples[index])
+        
+        if self.transform is not None:
+            #this_sample[0] = self.transform(this_sample[0])
+            this_sample = self.transform(this_sample)
+        #this_sample[1] = np.array(this_sample[1])
+        this_sample = np.array(this_sample)
+
+        return this_sample    
+    
+    def __len__(self):
+        return len(self.samples)
+
+    def _loader(self, img_path):
+        return Image.open(img_path).convert('RGB')
+
+    
 class PersonReIDSamples:
 
     def __init__(self, samples_path, reorder=True):
@@ -91,27 +127,3 @@ class Samples4Duke(PersonReIDSamples):
         split_list = file_name.replace('.jpg', '').replace('c', '').split('_')
         identi_id, camera_id = int(split_list[0]), int(split_list[1])
         return identi_id, camera_id
-
-
-class PersonReIDDataSet:
-
-    def __init__(self, samples, transform):
-        self.samples = samples
-        self.transform = transform
-
-    def __getitem__(self, index):
-
-        this_sample = copy.deepcopy(self.samples[index])
-
-        this_sample[0] = self._loader(this_sample[0])
-        if self.transform is not None:
-            this_sample[0] = self.transform(this_sample[0])
-        this_sample[1] = np.array(this_sample[1])
-
-        return this_sample
-
-    def __len__(self):
-        return len(self.samples)
-
-    def _loader(self, img_path):
-        return Image.open(img_path).convert('RGB')
